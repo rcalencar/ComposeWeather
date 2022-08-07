@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">ComposeWeather</string>
+    <string name="image_url">https://host/%1$s.png</string>
+    <string name="temperature">%1$s\u00B0</string>
+    <string name="l_h">L: %1$s\u00B0 H: %2$s\u00B0</string>
+    <string name="tomorrow">Tomorrow</string>
+</resources>
