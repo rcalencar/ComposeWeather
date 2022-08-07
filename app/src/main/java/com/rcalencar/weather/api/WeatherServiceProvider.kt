@@ -5,7 +5,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 fun weatherService() : WeatherService {
     return Retrofit.Builder()
-        .baseUrl("https://host/")
+        .baseUrl("https://raw.githubusercontent.com/")
         .addConverterFactory(GsonConverterFactory.create())
         .build()
         .create(WeatherService::class.java)
