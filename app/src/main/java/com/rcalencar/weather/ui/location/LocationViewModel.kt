@@ -5,8 +5,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.rcalencar.weather.api.WeatherEntry
-import com.rcalencar.weather.api.WeatherInformation
+import com.rcalencar.weather.repository.remote.WeatherEntry
+import com.rcalencar.weather.repository.remote.WeatherInformation
 import com.rcalencar.weather.isSameDay
 import com.rcalencar.weather.repository.Status
 import com.rcalencar.weather.repository.WeatherRepository

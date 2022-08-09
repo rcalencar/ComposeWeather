@@ -1,4 +1,4 @@
-package com.rcalencar.weather.api
+package com.rcalencar.weather.repository.remote
 
 import retrofit2.http.GET
 import retrofit2.http.Path

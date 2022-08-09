@@ -1,4 +1,4 @@
-package com.rcalencar.weather.api
+package com.rcalencar.weather.repository.remote
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

@@ -1,8 +1,8 @@
 package com.rcalencar.weather.repository
 
-import com.rcalencar.weather.AppDatabase
-import com.rcalencar.weather.api.WeatherInformation
-import com.rcalencar.weather.api.WeatherService
+import com.rcalencar.weather.repository.local.AppDatabase
+import com.rcalencar.weather.repository.remote.WeatherInformation
+import com.rcalencar.weather.repository.remote.WeatherService
 import kotlinx.coroutines.delay
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -16,7 +16,7 @@ class WeatherRepository @Inject constructor(
         val dao = appDatabase.WeatherInformationDao()
         val weatherInformation = dao.loadById(id)
         return if (weatherInformation == null) {
-            delay(1900L)
+            delay(3000L)
             return try {
                 val data = weatherService.getWeather(id)
                 dao.insertAll(data)
@@ -25,6 +25,7 @@ class WeatherRepository @Inject constructor(
                 Resource.error(data = null, message = exception.message ?: "Error Occurred!")
             }
         } else {
+            delay(1000L)
             Resource.success(data = weatherInformation)
         }
     }

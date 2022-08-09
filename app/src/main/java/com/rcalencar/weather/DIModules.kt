@@ -2,8 +2,9 @@ package com.rcalencar.weather
 
 import android.content.Context
 import androidx.room.Room
-import com.rcalencar.weather.api.WeatherService
-import com.rcalencar.weather.api.weatherService
+import com.rcalencar.weather.repository.remote.WeatherService
+import com.rcalencar.weather.repository.remote.weatherService
+import com.rcalencar.weather.repository.local.AppDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
