@@ -1,9 +1,10 @@
 package com.rcalencar.weather.api
 
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 import java.util.*
 
-data class WeatherEntryApiModel(
+data class WeatherEntry(
     @field:SerializedName("id")
     val id: Long,
     @field:SerializedName("weather_state_name")
@@ -18,4 +19,4 @@ data class WeatherEntryApiModel(
     val maxTemp: Float,
     @field:SerializedName("the_temp")
     val theTemp: Float,
-)
+): Serializable

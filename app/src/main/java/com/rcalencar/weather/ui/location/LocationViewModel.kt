@@ -5,8 +5,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.rcalencar.weather.api.WeatherEntryApiModel
-import com.rcalencar.weather.api.WeatherInformationApiModel
+import com.rcalencar.weather.api.WeatherEntry
+import com.rcalencar.weather.api.WeatherInformation
 import com.rcalencar.weather.isSameDay
 import com.rcalencar.weather.repository.Status
 import com.rcalencar.weather.repository.WeatherRepository
@@ -52,7 +52,7 @@ class LocationViewModel @Inject constructor(
     }
 }
 
-fun WeatherInformationApiModel.toCurrentWeather(): CurrentWeather {
+fun WeatherInformation.toCurrentWeather(): CurrentWeather {
     val currentEntry =
         this.consolidatedWeather.firstOrNull { this.time.isSameDay(it.applicableDate) }
     val forecast =
@@ -71,7 +71,7 @@ fun WeatherInformationApiModel.toCurrentWeather(): CurrentWeather {
     } ?: emptyCurrentWeather
 }
 
-fun WeatherEntryApiModel.toForecastWeather(): ForecastWeather {
+fun WeatherEntry.toForecastWeather(): ForecastWeather {
     return ForecastWeather(
         applicableDate = this.applicableDate.dateToString("MMM dd"),
         weatherStateName = this.weatherStateName,
