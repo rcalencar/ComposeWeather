@@ -1,6 +1,7 @@
 package com.rcalencar.weather
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.room.Room
 import com.rcalencar.weather.repository.remote.WeatherService
 import com.rcalencar.weather.repository.remote.weatherService
@@ -29,5 +30,12 @@ class ServiceModules {
             appContext,
             AppDatabase::class.java
         ).build()
+    }
+
+    @Singleton
+    @Provides
+    fun provideAppSharedPreference(@ApplicationContext appContext: Context): SharedPreferences {
+        return appContext.getSharedPreferences(
+            appContext.getString(R.string.preference_file_key), Context.MODE_PRIVATE)
     }
 }

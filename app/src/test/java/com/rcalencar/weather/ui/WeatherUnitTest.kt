@@ -1,5 +1,6 @@
 package com.rcalencar.weather.ui
 
+import android.content.SharedPreferences
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.rcalencar.weather.repository.Resource
 import com.rcalencar.weather.repository.WeatherRepository
@@ -25,6 +26,7 @@ class WeatherUnitTest {
     val instantExecutorRule = InstantTaskExecutorRule()
 
     private val repository = Mockito.mock(WeatherRepository::class.java)
+    private val sharedPref = Mockito.mock(SharedPreferences::class.java)
 
     @Before
     fun setUp() {
@@ -39,7 +41,7 @@ class WeatherUnitTest {
     @Test
     fun testFromViewModelToRepositoryCall() = runTest {
         `when`(repository.loadWeatherInformation(1L)).thenReturn(Resource.success())
-        val mainViewModel = LocationViewModel(repository)
+        val mainViewModel = LocationViewModel(repository, sharedPref)
         mainViewModel.fetchWeather(1L)
         advanceUntilIdle()
         verify(repository).loadWeatherInformation(1L)

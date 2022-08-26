@@ -10,42 +10,41 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.rcalencar.weather.ui.location.LocationScreen
-import com.rcalencar.weather.ui.location.WeatherScreen
+import com.rcalencar.weather.ui.location.InitialScreen
 import com.rcalencar.weather.ui.theme.WeatherTheme
 import dagger.hilt.android.AndroidEntryPoint
 
-
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             WeatherApp()
         }
     }
+}
 
-    @Composable
-    private fun WeatherApp() {
-        WeatherTheme {
-            val navController = rememberNavController()
-            NavHost(
-                navController = navController,
-                startDestination = Home.route,
-            ) {
-                composable(route = Home.route) {
-                    WeatherScreen(
-                        onLocationClick = { locationId ->
-                            navController.navigate("${Location.route}/$locationId")
-                        })
-                }
-                composable(
-                    route = Location.routeWithArgs,
-                    arguments = Location.arguments
-                ) { navBackStackEntry ->
-                    val locationId =
-                        navBackStackEntry.arguments?.getLong(Location.locationIdArg) ?: 0
-                    LocationScreen(locationId)
-                }
+@Composable
+private fun WeatherApp() {
+    WeatherTheme {
+        val navController = rememberNavController()
+        NavHost(
+            navController = navController,
+            startDestination = Home.route,
+        ) {
+            composable(route = Home.route) {
+                InitialScreen(
+                    onLocationClick = { locationId ->
+                        navController.navigate("${Location.route}/$locationId")
+                    })
+            }
+            composable(
+                route = Location.routeWithArgs,
+                arguments = Location.arguments
+            ) { navBackStackEntry ->
+                val locationId =
+                    navBackStackEntry.arguments?.getLong(Location.locationIdArg) ?: 0
+                LocationScreen(locationId)
             }
         }
     }
@@ -58,7 +57,7 @@ interface Destination {
 
 object Home : Destination {
     override val route = "home"
-    override val screen: @Composable () -> Unit = { WeatherScreen() }
+    override val screen: @Composable () -> Unit = { InitialScreen() }
 }
 
 object Location : Destination {

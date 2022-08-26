@@ -4,4 +4,5 @@
     <string name="temperature">%1$s\u00B0</string>
     <string name="l_h">L: %1$s\u00B0 H: %2$s\u00B0</string>
     <string name="tomorrow">Tomorrow</string>
+    <string name="preference_file_key">shared_preference_preference_file_key</string>
 </resources>

@@ -1,30 +1,53 @@
 package com.rcalencar.weather.ui.location
 
+import android.content.SharedPreferences
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.rcalencar.weather.repository.remote.WeatherEntry
-import com.rcalencar.weather.repository.remote.WeatherInformation
+import com.rcalencar.weather.dateToString
 import com.rcalencar.weather.isSameDay
+import com.rcalencar.weather.persist
 import com.rcalencar.weather.repository.Status
 import com.rcalencar.weather.repository.WeatherRepository
+import com.rcalencar.weather.repository.remote.WeatherEntry
+import com.rcalencar.weather.repository.remote.WeatherInformation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.*
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
+enum class TemperatureUnit {
+    C,
+    F
+}
+
 @HiltViewModel
 class LocationViewModel @Inject constructor(
-    private val repository: WeatherRepository
+    private val repository: WeatherRepository,
+    sharedPreferences: SharedPreferences,
 ) : ViewModel() {
+    private var currentWeatherId: Long? = null
+
     var state by mutableStateOf(LocationUiState())
         private set
 
+    var temperatureUnit by sharedPreferences.persist(
+        TemperatureUnit.C,
+        toString = { it.name },
+        fromString = { TemperatureUnit.valueOf(it) }
+    )
+        private set
+
+    private fun refresh() {
+        currentWeatherId?.let {
+            fetchWeather(it)
+        }
+    }
+
     fun fetchWeather(id: Long) {
+        currentWeatherId = id
         state = state.copy(
             loading = true,
             currentWeather = emptyCurrentWeather,
@@ -36,7 +59,8 @@ class LocationViewModel @Inject constructor(
                 Status.SUCCESS -> {
                     state = state.copy(
                         loading = false,
-                        currentWeather = result.data?.toCurrentWeather() ?: emptyCurrentWeather,
+                        currentWeather = result.data?.toCurrentWeather(temperatureUnit)
+                            ?: emptyCurrentWeather,
                         errorMessage = null
                     )
                 }
@@ -50,38 +74,51 @@ class LocationViewModel @Inject constructor(
             }
         }
     }
+
+    fun toggleUnit() {
+        temperatureUnit = if (temperatureUnit == TemperatureUnit.F) {
+            TemperatureUnit.C
+        } else {
+            TemperatureUnit.F
+        }
+        refresh()
+    }
 }
 
-fun WeatherInformation.toCurrentWeather(): CurrentWeather {
+fun WeatherInformation.toCurrentWeather(unit: TemperatureUnit): CurrentWeather {
     val currentEntry =
         this.consolidatedWeather.firstOrNull { this.time.isSameDay(it.applicableDate) }
     val forecast =
         this.consolidatedWeather.filter { it.applicableDate > currentEntry?.applicableDate }
-            .sortedBy { it.applicableDate }.map { it.toForecastWeather() }
+            .sortedBy { it.applicableDate }.map { it.toForecastWeather(unit) }
     return currentEntry?.let {
         CurrentWeather(
             title = this.title,
             weatherStateName = currentEntry.weatherStateName,
             weatherStateAbbr = currentEntry.weatherStateAbbr,
-            minTemp = currentEntry.minTemp.roundToInt().toString(),
-            maxTemp = currentEntry.maxTemp.roundToInt().toString(),
-            theTemp = currentEntry.theTemp.roundToInt().toString(),
+            minTemp = convert(currentEntry.minTemp, unit).roundToInt().toString(),
+            maxTemp = convert(currentEntry.maxTemp, unit).roundToInt().toString(),
+            theTemp = convert(currentEntry.theTemp, unit).roundToInt().toString(),
             forecast = forecast
         )
     } ?: emptyCurrentWeather
 }
 
-fun WeatherEntry.toForecastWeather(): ForecastWeather {
+fun WeatherEntry.toForecastWeather(unit: TemperatureUnit): ForecastWeather {
     return ForecastWeather(
         applicableDate = this.applicableDate.dateToString("MMM dd"),
         weatherStateName = this.weatherStateName,
         weatherStateAbbr = this.weatherStateAbbr,
-        minTemp = this.minTemp.roundToInt().toString(),
-        maxTemp = this.maxTemp.roundToInt().toString(),
+        minTemp = convert(this.minTemp, unit).roundToInt().toString(),
+        maxTemp = convert(this.maxTemp, unit).roundToInt().toString(),
     )
 }
 
-private fun Date.dateToString(format: String): String {
-    val dateFormatter = SimpleDateFormat(format, Locale.getDefault())
-    return dateFormatter.format(this)
+private fun convert(value: Float, unit: TemperatureUnit): Float {
+    return if (unit == TemperatureUnit.C) value
+    else cToF(value)
+}
+
+private fun cToF(temp: Float): Float {
+    return (temp * 1.8f) + 32
 }

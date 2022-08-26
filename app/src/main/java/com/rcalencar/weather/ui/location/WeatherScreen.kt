@@ -1,5 +1,6 @@
 package com.rcalencar.weather.ui.location
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,7 +37,7 @@ import com.rcalencar.weather.R
 import com.rcalencar.weather.ui.theme.WeatherTheme
 
 @Composable
-fun WeatherScreen(
+fun InitialScreen(
     onLocationClick: (Long) -> Unit = {}
 ) {
     Column {
@@ -58,22 +59,38 @@ fun LocationScreen(
         locationViewModel.fetchWeather(id)
     }
     val locationUiState = locationViewModel.state
+    val unit = locationViewModel.temperatureUnit
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colors.background
     ) {
-        LocationComposable(locationUiState)
+        LocationComposable(locationUiState, unit.name, onUnitClick = { locationViewModel.toggleUnit() })
     }
 }
 
 @Composable
-private fun LocationComposable(locationUiState: LocationUiState) {
+private fun LocationComposable(
+    locationUiState: LocationUiState,
+    unit: String,
+    onUnitClick: () -> Unit = {}
+) {
     if (locationUiState.loading) {
         Box(contentAlignment = Alignment.Center) {
             CircularProgressIndicator(modifier = Modifier.size(40.dp))
         }
     } else {
         Column(modifier = Modifier.padding(top = 56.dp)) {
+            Row(
+                modifier = Modifier
+                    .padding(start = 24.dp, end = 24.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                Text(modifier = Modifier
+                    .clickable { onUnitClick() }
+                    .padding(8.dp),
+                    text = unit)
+            }
             CurrentWeather(
                 modifier = Modifier.padding(start = 24.dp, end = 24.dp),
                 locationUiState = locationUiState
@@ -222,7 +239,7 @@ fun DefaultPreview() {
         errorMessage = "Error"
     )
     WeatherTheme {
-        LocationComposable(state)
+        LocationComposable(state, "C")
     }
 }
 
@@ -230,7 +247,7 @@ fun DefaultPreview() {
 @Composable
 fun WeatherPreview() {
     WeatherTheme {
-        WeatherScreen()
+        InitialScreen()
     }
 }
 
