@@ -11,6 +11,5 @@ It has one sample unit test - WeatherUnitTest.testFromViewModelToRepositoryCall(
  - ViewModel
  - Repository
  - Api service
-
-## Future improvements  
- - To implement a local cache data source
+ - Room local database
+ - DI with Hilt
