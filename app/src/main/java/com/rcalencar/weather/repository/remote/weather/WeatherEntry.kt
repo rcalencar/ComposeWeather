@@ -1,4 +1,4 @@
-package com.rcalencar.weather.repository.remote
+package com.rcalencar.weather.repository.remote.weather
 
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable

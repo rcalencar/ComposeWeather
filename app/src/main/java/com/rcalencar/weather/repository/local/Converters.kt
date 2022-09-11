@@ -3,7 +3,7 @@ package com.rcalencar.weather.repository.local
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.rcalencar.weather.repository.remote.WeatherEntry
+import com.rcalencar.weather.repository.remote.weather.WeatherEntry
 import java.lang.reflect.Type
 import java.util.*
 

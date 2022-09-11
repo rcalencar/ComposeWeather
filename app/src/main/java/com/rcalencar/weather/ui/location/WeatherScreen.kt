@@ -12,7 +12,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Button
@@ -34,47 +36,87 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.rcalencar.weather.R
+import com.rcalencar.weather.repository.remote.locations.Location
 import com.rcalencar.weather.ui.theme.WeatherTheme
 
 @Composable
-fun InitialScreen(
+fun LocationsScreen(
+    locationViewModel: LocationViewModel = hiltViewModel(),
     onLocationClick: (Long) -> Unit = {}
 ) {
-    Column {
-        Button(onClick = { onLocationClick(4418) }) {
-            Text(text = "Toronto")
+    LaunchedEffect(key1 = true) {
+        locationViewModel.fetchLocations()
+    }
+    val locationsUiState = locationViewModel.state
+    if (locationsUiState.loading) {
+        Box(contentAlignment = Alignment.Center) {
+            CircularProgressIndicator(modifier = Modifier.size(40.dp))
         }
-        Button(onClick = { onLocationClick(4419) }) {
-            Text(text = "Montreal")
+    } else {
+        LazyColumn(
+            state = rememberLazyListState()
+        ) {
+            items(locationsUiState.locations) { item ->
+                LocationRowItem(item, onLocationClick)
+            }
         }
     }
 }
 
 @Composable
-fun LocationScreen(
-    id: Long = 0,
-    locationViewModel: LocationViewModel = hiltViewModel(),
+private fun LocationRowItem(
+    item: Location,
+    onLocationClick: (Long) -> Unit,
+    weatherViewModel: WeatherViewModel = hiltViewModel(),
 ) {
     LaunchedEffect(key1 = true) {
-        locationViewModel.fetchWeather(id)
+        weatherViewModel.fetchWeather(item.woeid)
     }
-    val locationUiState = locationViewModel.state
-    val unit = locationViewModel.temperatureUnit
+    val weatherUiState = weatherViewModel.state
+    Row {
+        Button(onClick = { onLocationClick(item.woeid) }) {
+            Text(text = item.title)
+        }
+        AsyncImage(
+            model = stringResource(
+                R.string.image_url,
+                weatherUiState.currentWeather.weatherStateAbbr
+            ),
+            placeholder = painterResource(R.drawable.ic_launcher_foreground),
+            error = painterResource(R.drawable.ic_launcher_foreground),
+            modifier = Modifier
+                .width(55.dp),
+            contentDescription = null
+        )
+    }
+}
+
+
+@Composable
+fun WeatherScreen(
+    id: Long = 0,
+    weatherViewModel: WeatherViewModel = hiltViewModel(),
+) {
+    LaunchedEffect(key1 = true) {
+        weatherViewModel.fetchWeather(id)
+    }
+    val weatherUiState = weatherViewModel.state
+    val unit = weatherViewModel.temperatureUnit
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colors.background
     ) {
-        LocationComposable(locationUiState, unit.name, onUnitClick = { locationViewModel.toggleUnit() })
+        WeatherInfoComposable(weatherUiState, unit.name, onUnitClick = { weatherViewModel.toggleUnit() })
     }
 }
 
 @Composable
-private fun LocationComposable(
-    locationUiState: LocationUiState,
+private fun WeatherInfoComposable(
+    weatherUiState: WeatherUiState,
     unit: String,
     onUnitClick: () -> Unit = {}
 ) {
-    if (locationUiState.loading) {
+    if (weatherUiState.loading) {
         Box(contentAlignment = Alignment.Center) {
             CircularProgressIndicator(modifier = Modifier.size(40.dp))
         }
@@ -93,13 +135,13 @@ private fun LocationComposable(
             }
             CurrentWeather(
                 modifier = Modifier.padding(start = 24.dp, end = 24.dp),
-                locationUiState = locationUiState
+                weatherUiState = weatherUiState
             )
             Spacer(modifier = Modifier.height(16.dp))
             LazyRow(
                 state = rememberLazyListState()
             ) {
-                itemsIndexed(locationUiState.currentWeather.forecast) { index, item ->
+                itemsIndexed(weatherUiState.currentWeather.forecast) { index, item ->
                     if (index == 0) {
                         Spacer(modifier = Modifier.width(8.dp))
                     }
@@ -113,7 +155,7 @@ private fun LocationComposable(
                             index = index
                         )
                     }
-                    if (index == locationUiState.currentWeather.forecast.lastIndex) {
+                    if (index == weatherUiState.currentWeather.forecast.lastIndex) {
                         Spacer(modifier = Modifier.width(8.dp))
                     }
                 }
@@ -125,11 +167,11 @@ private fun LocationComposable(
 @Composable
 private fun CurrentWeather(
     modifier: Modifier = Modifier,
-    locationUiState: LocationUiState
+    weatherUiState: WeatherUiState
 ) {
     Column(modifier = modifier) {
         Text(
-            text = locationUiState.currentWeather.title,
+            text = weatherUiState.currentWeather.title,
             fontSize = 40.sp,
             fontWeight = FontWeight.Bold
         )
@@ -143,7 +185,7 @@ private fun CurrentWeather(
                 AsyncImage(
                     model = stringResource(
                         R.string.image_url,
-                        locationUiState.currentWeather.weatherStateAbbr
+                        weatherUiState.currentWeather.weatherStateAbbr
                     ),
                     placeholder = painterResource(R.drawable.ic_launcher_foreground),
                     error = painterResource(R.drawable.ic_launcher_foreground),
@@ -155,28 +197,28 @@ private fun CurrentWeather(
                 Text(
                     text = stringResource(
                         R.string.temperature,
-                        locationUiState.currentWeather.theTemp
+                        weatherUiState.currentWeather.theTemp
                     ),
                     fontSize = 70.sp,
                 )
             }
             Text(
-                text = locationUiState.currentWeather.weatherStateName,
+                text = weatherUiState.currentWeather.weatherStateName,
                 fontSize = 17.sp,
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = stringResource(
                     R.string.l_h,
-                    locationUiState.currentWeather.minTemp,
-                    locationUiState.currentWeather.maxTemp
+                    weatherUiState.currentWeather.minTemp,
+                    weatherUiState.currentWeather.maxTemp
                 ),
                 fontSize = 26.sp,
             )
-            if (!locationUiState.errorMessage.isNullOrEmpty()) {
+            if (!weatherUiState.errorMessage.isNullOrEmpty()) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = locationUiState.errorMessage,
+                    text = weatherUiState.errorMessage,
                 )
             }
         }
@@ -225,7 +267,7 @@ private fun ForecastWeather(
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
-    val state = LocationUiState(
+    val state = WeatherUiState(
         loading = false,
         currentWeather = CurrentWeather(
             title = "Toronto",
@@ -239,7 +281,7 @@ fun DefaultPreview() {
         errorMessage = "Error"
     )
     WeatherTheme {
-        LocationComposable(state, "C")
+        WeatherInfoComposable(state, "C")
     }
 }
 
@@ -247,7 +289,7 @@ fun DefaultPreview() {
 @Composable
 fun WeatherPreview() {
     WeatherTheme {
-        InitialScreen()
+        LocationsScreen()
     }
 }
 

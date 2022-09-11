@@ -9,8 +9,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.rcalencar.weather.ui.location.LocationScreen
-import com.rcalencar.weather.ui.location.InitialScreen
+import com.rcalencar.weather.ui.location.WeatherScreen
+import com.rcalencar.weather.ui.location.LocationsScreen
 import com.rcalencar.weather.ui.theme.WeatherTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -30,21 +30,21 @@ private fun WeatherApp() {
         val navController = rememberNavController()
         NavHost(
             navController = navController,
-            startDestination = Home.route,
+            startDestination = LocationsDestination.route,
         ) {
-            composable(route = Home.route) {
-                InitialScreen(
+            composable(route = LocationsDestination.route) {
+                LocationsScreen(
                     onLocationClick = { locationId ->
-                        navController.navigate("${Location.route}/$locationId")
+                        navController.navigate("${WeatherDestination.route}/$locationId")
                     })
             }
             composable(
-                route = Location.routeWithArgs,
-                arguments = Location.arguments
+                route = WeatherDestination.routeWithArgs,
+                arguments = WeatherDestination.arguments
             ) { navBackStackEntry ->
                 val locationId =
-                    navBackStackEntry.arguments?.getLong(Location.locationIdArg) ?: 0
-                LocationScreen(locationId)
+                    navBackStackEntry.arguments?.getLong(WeatherDestination.locationIdArg) ?: 0
+                WeatherScreen(locationId)
             }
         }
     }
@@ -55,14 +55,14 @@ interface Destination {
     val screen: @Composable () -> Unit
 }
 
-object Home : Destination {
+object LocationsDestination : Destination {
     override val route = "home"
-    override val screen: @Composable () -> Unit = { InitialScreen() }
+    override val screen: @Composable () -> Unit = { LocationsScreen() }
 }
 
-object Location : Destination {
+object WeatherDestination : Destination {
     override val route = "location"
-    override val screen: @Composable () -> Unit = { LocationScreen() }
+    override val screen: @Composable () -> Unit = { WeatherScreen() }
     const val locationIdArg = "location_id"
     val routeWithArgs = "$route/{$locationIdArg}"
     val arguments = listOf(
