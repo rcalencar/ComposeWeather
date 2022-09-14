@@ -1,4 +1,4 @@
-package com.rcalencar.weather.ui.location
+package com.rcalencar.weather.ui.weather
 
 import android.content.SharedPreferences
 import androidx.compose.runtime.getValue
@@ -40,12 +40,6 @@ class WeatherViewModel @Inject constructor(
     )
         private set
 
-    private fun refresh() {
-        currentWeatherId?.let {
-            fetchWeather(it)
-        }
-    }
-
     fun fetchWeather(id: Long) {
         currentWeatherId = id
         state = state.copy(
@@ -72,6 +66,12 @@ class WeatherViewModel @Inject constructor(
                     )
                 }
             }
+        }
+    }
+
+    private fun refresh() {
+        currentWeatherId?.let {
+            fetchWeather(it)
         }
     }
 

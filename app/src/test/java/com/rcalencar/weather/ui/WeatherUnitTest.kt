@@ -4,7 +4,7 @@ import android.content.SharedPreferences
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.rcalencar.weather.repository.Resource
 import com.rcalencar.weather.repository.WeatherRepository
-import com.rcalencar.weather.ui.location.WeatherViewModel
+import com.rcalencar.weather.ui.weather.WeatherViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher

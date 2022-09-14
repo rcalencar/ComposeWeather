@@ -9,7 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.rcalencar.weather.ui.location.WeatherScreen
+import com.rcalencar.weather.ui.weather.WeatherScreen
 import com.rcalencar.weather.ui.location.LocationsScreen
 import com.rcalencar.weather.ui.theme.WeatherTheme
 import dagger.hilt.android.AndroidEntryPoint

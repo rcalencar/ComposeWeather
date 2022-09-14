@@ -1,4 +1,4 @@
-package com.rcalencar.weather.ui.location
+package com.rcalencar.weather.ui.weather
 
 data class CurrentWeather(
     val title: String,

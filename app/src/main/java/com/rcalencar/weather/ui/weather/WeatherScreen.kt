@@ -1,4 +1,4 @@
-package com.rcalencar.weather.ui.location
+package com.rcalencar.weather.ui.weather
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -12,12 +12,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
@@ -36,61 +33,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.rcalencar.weather.R
-import com.rcalencar.weather.repository.remote.locations.Location
 import com.rcalencar.weather.ui.theme.WeatherTheme
-
-@Composable
-fun LocationsScreen(
-    locationViewModel: LocationViewModel = hiltViewModel(),
-    onLocationClick: (Long) -> Unit = {}
-) {
-    LaunchedEffect(key1 = true) {
-        locationViewModel.fetchLocations()
-    }
-    val locationsUiState = locationViewModel.state
-    if (locationsUiState.loading) {
-        Box(contentAlignment = Alignment.Center) {
-            CircularProgressIndicator(modifier = Modifier.size(40.dp))
-        }
-    } else {
-        LazyColumn(
-            state = rememberLazyListState()
-        ) {
-            items(locationsUiState.locations) { item ->
-                LocationRowItem(item, onLocationClick)
-            }
-        }
-    }
-}
-
-@Composable
-private fun LocationRowItem(
-    item: Location,
-    onLocationClick: (Long) -> Unit,
-    weatherViewModel: WeatherViewModel = hiltViewModel(),
-) {
-    LaunchedEffect(key1 = true) {
-        weatherViewModel.fetchWeather(item.woeid)
-    }
-    val weatherUiState = weatherViewModel.state
-    Row {
-        Button(onClick = { onLocationClick(item.woeid) }) {
-            Text(text = item.title)
-        }
-        AsyncImage(
-            model = stringResource(
-                R.string.image_url,
-                weatherUiState.currentWeather.weatherStateAbbr
-            ),
-            placeholder = painterResource(R.drawable.ic_launcher_foreground),
-            error = painterResource(R.drawable.ic_launcher_foreground),
-            modifier = Modifier
-                .width(55.dp),
-            contentDescription = null
-        )
-    }
-}
-
 
 @Composable
 fun WeatherScreen(
@@ -285,13 +228,6 @@ fun DefaultPreview() {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun WeatherPreview() {
-    WeatherTheme {
-        LocationsScreen()
-    }
-}
 
 @Preview(showBackground = true)
 @Composable

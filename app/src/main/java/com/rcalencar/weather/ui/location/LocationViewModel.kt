@@ -29,9 +29,16 @@ class LocationViewModel @Inject constructor(
             val result = repository.loadLocations()
             when(result.status) {
                 Status.SUCCESS -> {
+//                    val items = result.data ?: emptyList()
+//                    val weatherInfo = mutableListOf<Deferred<Resource<WeatherInformation>>>()
+//                    for (item in items) {
+//                        val element = async { repository.loadWeatherInformation(item.woeid) }
+//                        weatherInfo.add(element)
+//                    }
+//                    val allWeather = weatherInfo.awaitAll()
                     state = state.copy(
                         loading = false,
-                        locations = result.data ?: emptyList(),
+                        locations = result.data ?: emptyList(), // TODO: use of UI related data type
                         errorMessage = null
                     )
                 }
